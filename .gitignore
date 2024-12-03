@@ -3,10 +3,11 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-/damage-radius-geocoder
 __pycache__
+/damage-radius-finder
 /data/geojson.json
 /data/addresses_in_bounding.csv
+
 
 # User-specific files
 *.rsuser
