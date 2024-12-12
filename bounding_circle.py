@@ -1,7 +1,6 @@
 import math
 
 class BoundingCircle:
-    EARTH_RADIUS = 6371000  # Earth's radius in meters
 
     def __init__(self, center_lat, center_lon, radius_meters):
         """
@@ -21,7 +20,7 @@ class BoundingCircle:
 
         :return: Dictionary with lat/lon boundaries (min_lat, max_lat, min_lon, max_lon)
         """
-        angular_distance = self.radius_meters / self.EARTH_RADIUS
+        angular_distance = self.radius_meters / 6371000 # Earth's radius in meters
 
         # Latitude boundaries (degrees)
         min_lat = self.center_lat - math.degrees(angular_distance)
