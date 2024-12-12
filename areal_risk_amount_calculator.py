@@ -97,6 +97,7 @@ class ArealRiskAmountCalculator:
 
         return bounding_coordinates
 
+
     def filter_addresses_in_bounding_circle(self, bounding_coordinates: dict):
         # Ensure latitude and longitude are numeric
         addresses['lat_wgs84'] = pd.to_numeric(addresses['lat_wgs84'], errors='coerce')
@@ -114,14 +115,15 @@ class ArealRiskAmountCalculator:
 
 
     def filter_clients_in_bounding_circle(self, filtered_bounding_circle_addresses: pd.DataFrame):
-        # Ensure clients data is clean and standardized
+        # Ensure postal_code is numeric
         clients['postal_code'] = pd.to_numeric(clients['postal_code'], errors='coerce')
         clients['street_name'] = clients['street_name'].str.lower().str.strip()
         clients['street_number'] = clients['street_number'].astype(str).str.lower().str.strip()
 
         # Normalize filtered addresses
-        filtered_bounding_circle_addresses.loc[:, 'rue'] = filtered_bounding_circle_addresses['rue'].str.lower().str.strip()
-        filtered_bounding_circle_addresses.loc[:, 'numero'] = filtered_bounding_circle_addresses['numero'].astype(str).str.lower().str.strip()
+        filtered_bounding_circle_addresses['rue'] = filtered_bounding_circle_addresses['rue'].str.lower().str.strip()
+        filtered_bounding_circle_addresses['numero'] = filtered_bounding_circle_addresses['numero'].astype(
+            str).str.lower().str.strip()
 
         # Merge clients with filtered addresses on matching postal code, street name, and street number
         merged_data = pd.merge(
@@ -132,10 +134,6 @@ class ArealRiskAmountCalculator:
             right_on=['code_postal', 'rue', 'numero']
         )
 
-        # Check if 'insured_amount_EUR' exists in clients DataFrame
-        if 'insured_amount_EUR' not in merged_data.columns:
-            raise KeyError("The column 'insured_amount_EUR' is missing in the clients data.")
-
         # Prepare the JSON output
         client_list = merged_data.apply(
             lambda row: {
@@ -143,12 +141,27 @@ class ArealRiskAmountCalculator:
                 "client_street_name": row['street_name'],
                 "client_postal_code": row['postal_code'],
                 "client_city": row['city'],
-                "client_insured_amount_EUR": row['insured_amount_EUR']
+                "client_insured_amount_eur": row['insured_amount_eur']
             },
             axis=1
         ).tolist()
 
-        return json.dumps({"circle_center_coordinates": [], "circle_radius_meters": self.bounding_circle_radius_meters, "total_insured_amounts_EUR": "", "clients": client_list}, indent=4)
+        total_insured_amounts_eur = sum(client['client_insured_amount_eur'] for client in client_list)
+        # logic to check if either coordinates or address were supplied,
+        # if coordinates were supplied but no address -> revers geocode, and take coordinates for circle_center_coordinates
+        # if address was supplied -> geocode, and take address for circle_center_street_number, circle_center_street_name, circle_center_postal_code and circle_center_city
+        circle_radius_meters = self.bounding_circle_radius_meters
+
+        return json.dumps({"circle_center_coordinates": [],
+                           "circle_center_street_number": "",
+                           "circle_center_street_name": "",
+                           "circle_center_postal_code": "",
+                           "circle_center_city": "",
+                           "circle_radius_meters": circle_radius_meters,
+                           "total_insured_amounts_eur": total_insured_amounts_eur,
+                           "clients": client_list},
+                          indent=4,
+                          ensure_ascii=False)
 
 
 # Example usage
