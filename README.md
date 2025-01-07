@@ -1,4 +1,4 @@
-# README: Geospatial Utilities
+# Geospatial Utilities
 
 This repository contains several Python scripts to handle geospatial data processing, focusing on address geocoding, bounding circle calculations, and risk assessment. These tools are designed for applications like locating clients within a specific radius, calculating insured risk amounts, and generating data files (CSV, GeoJSON) for visualization or further analysis.
 
