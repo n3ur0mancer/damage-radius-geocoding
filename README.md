@@ -78,15 +78,6 @@ print(f"GeoJSON saved to: {geojson_file}")
 
 ## Setup
 
-### **Prerequisites**
-- Python 3.7 or higher
-- Required libraries:
-  - pandas
-  - numpy
-  - json
-  - math
-  - os
-
 ### **Installation**
 1. Clone this repository:
    ```bash
@@ -95,7 +86,7 @@ print(f"GeoJSON saved to: {geojson_file}")
    ```
 2. Install dependencies:
    ```bash
-   pip install pandas numpy
+   pip install requirements.txt
    ```
 
 ### **Data Requirements**
